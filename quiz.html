@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quiz</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+<body onload = "checkQuiz()">
+    <section>
+        <div id = "quizQuestion" class="question">問題文</div>
+        <div id = "divchoices">
+            <button id = "quizChoice1" onclick = "check(1)">選択肢</button>
+            <button id = "quizChoice2" onclick = "check(2)">選択肢</button>
+            <button id = "quizChoice3" onclick = "check(3)">選択肢</button>
+            <button id = "quizChoice4" onclick = "check(0)">選択肢</button>
+        </div>
+        <div id="divstartbutton">
+            <!--<input type="button" id="startbutton" value="スタート" class="button"  onclick="start()">-->
+        </div>
+        <div id="scoreView" class="question">
+            <!--<div class="time-gauge" onanimationend="timeOut()"></div>-->
+        </div>
+    </section>
+
+    <section id="resultView" class="show-result">
+        <div class="size"><table id="resultTable"></table></div>
+    </section>
+
+    <div id="timeGaugeView"></div>
+
+    <script language="javascript" type="text/javascript">                
+
+        //使う変数
+        let finished = 0;
+        let started = 0;
+        let right = 0;
+        let wrong = 0;
+        let time = 0;
+        let out = 0;
+        let rightAnsewr = [...Array(5)];
+        const MISS = 3;
+        const timeGauge = '<div class="time-gauge" onanimationend="timeOut()"></div>';
+        const choices = `
+            <button id = "quizChoice1" onclick = "check(1)">選択肢</button>
+            <button id = "quizChoice2" onclick = "check(2)">選択肢</button>
+            <button id = "quizChoice3" onclick = "check(3)">選択肢</button>
+            <button id = "quizChoice4" onclick = "check(0)">選択肢</button>
+            `;
+        const startButton = `
+            <button id="startbutton" onclick="start()">スタート</button><br>
+            <button id="backbutton" onclick="location.href='index.html'">メニューに戻る</button>
+            `;
+        const divStartButton = document.getElementById("divstartbutton");
+        const timeGaugeView = document.getElementById("timeGaugeView");
+        const quizQuestion = document.getElementById("quizQuestion");
+        const resultTable = document.getElementById("resultTable");
+        const resultView = document.getElementById("resultView");
+        const divChoices = document.getElementById("divchoices");
+        const gameStart = document.getElementById("startbutton");
+        const scoreView = document.getElementById("scoreView");
+
+        //選択肢と正解と問題文 ["正解","選択肢","選択肢","選択肢","選択肢","問題文"]
+        let quizes = JSON.parse(sessionStorage.getItem("array"));
+        
+        //問題文の受け取り確認
+        const checkQuiz = function () {
+            if (quizes === null) {
+                location.href="index.html";
+            };
+            chooseQuestion();
+            chooseChoices();
+        };
+
+        //出題順格納
+        let quiznum = [...Array(quizes.length - 1)].map((_, i) =>1 + i);
+
+        //クリアタイム格納
+        let clearTime = [...Array(quizes.length)];
+        clearTime[quizes.length] = 0;
+
+        //ランダムな問題の表示
+        const chooseQuestion = function() {
+            resultTable.innerHTML = "";
+            let qnum = quizes.length - 1;
+            let s = 0;
+            let t = 0;
+            while (qnum) {
+                s = Math.floor(Math.random() * qnum);
+                t = quiznum[--qnum];
+                quiznum[qnum] = quiznum[s];
+                quiznum[s] = t;
+            };
+        };
+
+        //ランダムな整数を生成
+        const getRandomInt = function(integer) {
+            return Math.floor(Math.random() * integer);
+        };
+
+        //ランダムな選択肢の表示
+        const chooseChoices = function() {
+            const quizChoice1 = document.getElementById("quizChoice1");
+            const quizChoice2 = document.getElementById("quizChoice2");
+            const quizChoice3 = document.getElementById("quizChoice3");
+            const quizChoice4 = document.getElementById("quizChoice4");
+            quizQuestion.textContent = quizes[quiznum[right + wrong]][5];
+            let x = getRandomInt(4);
+            let y = (getRandomInt(2) * 2) + 1;
+            let z = getRandomInt(2);
+            let q1 = (((1 + x) + z) * y) % 4 + 1;
+            let q2 = (((2 + x) + (z * 3)) * y) % 4 + 1;
+            let q3 = ((3 + x) * y) % 4 + 1;
+            let q4 = (x * y) % 4 + 1;
+            quizChoice1.textContent = quizes[quiznum[right + wrong]][q1];
+            quizChoice2.textContent = quizes[quiznum[right + wrong]][q2];
+            quizChoice3.textContent = quizes[quiznum[right + wrong]][q3];
+            quizChoice4.textContent = quizes[quiznum[right + wrong]][q4];
+            rightAnsewr[1] = q1;
+            rightAnsewr[2] = q2;
+            rightAnsewr[3] = q3;
+            rightAnsewr[4] = q4;
+            started = new Date();
+            timeGaugeView.innerHTML = timeGauge;
+        };
+
+        //選択肢の正否判定
+        const check = function(ans) {
+            finished = new Date();
+            clearTime[right + wrong] = finished - started;
+            clearTime[quizes.length] += finished - started;
+            timeGaugeView.innerHTML = "";
+            if (quizes[quiznum[right + wrong]][rightAnsewr[ans]] == quizes[quiznum[right + wrong]][0]) {
+                scoreView.textContent = "正解 " + (clearTime[right + wrong]/1000).toFixed(3) + "秒";
+                right++;
+            } else {
+                scoreView.textContent = "不正解 " + (clearTime[right + wrong]/1000).toFixed(3) + "秒";
+                wrong++;
+            };
+            if (right + wrong == quizes.length - 1||wrong == MISS) {
+                result();
+                return;
+            };
+            chooseChoices();
+            document.activeElement.blur();
+        };
+
+        //時間切れ
+        const timeOut = function() {
+            clearTime[right + wrong] = 10000;
+            clearTime[quizes.length] += 10000;
+            scoreView.textContent = "不正解";
+            timeGaugeView.innerHTML = "";
+            wrong++;
+            out++;
+            if(right + wrong == quizes.length - 1||wrong == MISS){
+                result();
+                return;
+            };
+            chooseChoices();
+        };
+
+        //スタートの処理
+        const start = function() {
+            right = 0;
+            wrong = 0;
+            out = 0;
+            divChoices.innerHTML = choices;
+            chooseQuestion();
+            chooseChoices();
+            divStartButton.innerHTML = "";
+            scoreView.textContent = "";
+            clearTime[quizes.length] = 0;
+        };
+
+        //結果表示
+        const result = function() {
+            quizQuestion.textContent = "";
+            divChoices.innerHTML = "";
+            divStartButton.innerHTML = startButton;
+            scoreView.textContent = "終了";
+            time = (clearTime[quizes.length]/1000).toFixed(3);
+            const resultContens =
+            `<tr>
+                <th>正　解：</th><td>${right}回</td>
+            </tr>
+            <tr>
+                <th>不正解：</th><td>${wrong}回</td>
+            </tr>
+            <tr>
+                <th>時　間：</th><td>${time}秒</td>
+            </tr>`;
+            resultTable.innerHTML = resultContens;
+        };
+
+        //キーボード操作
+        window.onkeydown = function (evt) {
+            //結果表示後の場合
+            if (quizQuestion.textContent=="") {
+                return;
+            };
+            //結果表示前の場合
+            keyNum=Number(evt.key);
+            if (0>keyNum&&keyNum>5) {
+                return;
+            };
+            check(keyNum);
+        };
+    </script>
+</body>

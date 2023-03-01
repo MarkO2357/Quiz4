@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quiz</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div id="newer"></div>
+        <div class="card">
+            <div class="card-top">
+                <p class="card__title">問題１</p>
+            </div>
+            <div class="card__info">
+                <p class="episode__num"></p>
+                <p class="episode__type"></p>
+            </div>
+            <div class="card__btns">
+                <button class="add-btn">+</button>
+                <button class="watch-btn" onclick="session(0);location.href='quiz.html'">Go</button>
+            </div>
+        </div>
+        <script>
+            const newer = document.getElementById("newer");
+            let newQuestion = "";
+            const questions = [
+                [
+                    "問題１",
+                    ["東京都", "北海道", "京都府", "東京都", "大阪府", "日本の首都は？"],
+                    ["いちご", "ばなな", "みかん", "いちご", "ぶどう", "赤色の果実は？"],
+                    ["りんご", "りんご", "みかん", "ばなな", "ぶどう", "赤色の果実は？"],
+                    ["ぶどう", "りんご", "みかん", "いちご", "ぶどう", "紫色の果実は？"],
+                    ["ばなな", "みかん", "いちご", "ぶどう", "ばなな", "黄色の果実は？"]
+                ],
+                [
+                    "問題２",
+                    ["東京都", "長崎県", "沖縄県", "岐阜県", "東京都", "日本の首都は？"],
+                    ["みかん", "ばなな", "みかん", "いちご", "ぶどう", "オレンジ色の果実は？"],
+                    ["りんご", "みかん", "ばなな", "ぶどう", "りんご", "赤色の果実は？"],
+                    ["ぶどう", "りんご", "みかん", "いちご", "ぶどう", "紫色の果実は？"],
+                    ["ぶどう", "ばなな", "みかん", "いちご", "ぶどう", "紫色の果実は？"]
+                ],
+                [
+                    "確認用",
+                    ["ぶどう", "ばなな", "みかん", "いちご", "ぶどう", "紫色の果実は？"]
+                ],
+                [
+                    "問題１",
+                    ["東京都", "北海道", "京都府", "東京都", "大阪府", "日本の首都は？"],
+                    ["いちご", "ばなな", "みかん", "いちご", "ぶどう", "赤色の果実は？"],
+                    ["りんご", "りんご", "みかん", "ばなな", "ぶどう", "赤色の果実は？"],
+                    ["ぶどう", "りんご", "みかん", "いちご", "ぶどう", "紫色の果実は？"],
+                    ["ばなな", "みかん", "いちご", "ぶどう", "ばなな", "黄色の果実は？"]
+                ],
+                [
+                    "問題２",
+                    ["東京都", "長崎県", "沖縄県", "岐阜県", "東京都", "日本の首都は？"],
+                    ["みかん", "ばなな", "みかん", "いちご", "ぶどう", "オレンジ色の果実は？"],
+                    ["りんご", "みかん", "ばなな", "ぶどう", "りんご", "赤色の果実は？"],
+                    ["ぶどう", "りんご", "みかん", "いちご", "ぶどう", "紫色の果実は？"],
+                    ["ぶどう", "ばなな", "みかん", "いちご", "ぶどう", "紫色の果実は？"]
+                ],
+                [
+                    "確認用",
+                    ["ぶどう", "ばなな", "みかん", "いちご", "ぶどう", "紫色の果実は？"]
+                ]
+            ];
+
+            let i = 0;
+            const NOQ = questions.length - 1;
+            while(i<=NOQ) {
+                let forEachItem = `<button onclick="session(${i});location.href='quiz.html'">${questions[i][0]}</button>`;
+                newQuestion += forEachItem;
+                i++;
+            };
+            newer.innerHTML = newQuestion;
+
+            const session = function(int) {
+                let multidimensionarray = questions[int];
+            sessionStorage.setItem("array", JSON.stringify(multidimensionarray));
+            }
+        </script>
+    </body>
+</html>
